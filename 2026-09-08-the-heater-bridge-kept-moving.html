@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Heater Bridge Kept Moving · TinCanHacks</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+<header class="site">
+<h1>TIN<span class="can">CAN</span>HACKS</h1>
+<p class="tag">Tech and AI work logged from a 1979 Airstream and wherever it's parked.</p>
+<nav class="site"><a class="" href="index.html">index</a><a href="about.html">about</a></nav>
+</header>
+<main>
+<a class="back" href="index.html">&larr; index</a>
+<article class="post"><h2>The Heater Bridge Kept Moving</h2><div class="post-meta"><span class="date">2026-09-08</span></div><p>The diesel heater in the Airstream has a Bluetooth-to-MQTT bridge running on a Raspberry Pi. Home Assistant talks to it through a shell command with the Pi's IP address hardcoded. The Pi was on DHCP. Every time the lease changed, the heater integration broke. It had been .246. Then it was .240. The watchdog dutifully reported host_unreachable while the heater itself was fine.</p>
+<p>On September 8 we gave it a permanent address, 192.168.50.10. The part that's easy to get wrong: you're changing the IP of the machine you're currently SSH'd into. Kill the connection mid-apply and you're on the couch with a laptop.</p>
+<pre class="python"># migrate-static.py, condensed. host() runs the command on the Pi
+# via ssh through the HA container, using the old address.
+host(&#x27;sudo arping -D -I eth0 -c 4 192.168.50.10&#x27;)  # duplicate check first
+host(&#x27;sudo mkdir -p /root/heater-network-backup; &#x27;
+     &#x27;sudo cp -a /etc/NetworkManager/system-connections &#x27;
+     &#x27;/root/heater-network-backup/&#x27;)
+host(&#x27;sudo nmcli connection modify &lt;uuid&gt; ipv4.method manual &#x27;
+     &#x27;ipv4.addresses 192.168.50.10/24 ipv4.gateway 192.168.50.1&#x27;)
+host(&#x27;sudo systemd-run --unit=heater-ip-apply --on-active=3 &#x27;
+     &#x27;/usr/bin/nmcli connection up &lt;uuid&gt;&#x27;)</pre>
+<p>That last line is the trick. The new address goes live on a three-second timer instead of inline, so the SSH session answering us survives its own network going away.</p>
+<p>Then the follow-through. The HA config and the watchdog script both had the old address baked in. The update script asserted the old string was present, saved a <code>.before-static-ip</code> copy, and only then swapped it. For SSH trust it copied the authenticated host key from the old address rather than accepting a fresh network keyscan, which is the paranoid and correct move. The router side got handled in the same session: log into the Peplink, exclude .10 from the DHCP pool so nothing hands it out twice.</p>
+<p>Verification was a small script that queried the HA API for the diesel sensor entities. Live status arriving about every two seconds, HA showing Standby, room 68F, watchdog healthy. No heater commands issued, no power cycling. The one honest gap in the notes: the duplicate-address check passed, but the router's DHCP exclusion wasn't confirmed at migration time.</p>
+<p>The heater didn't notice. That was the goal.</p></article>
+</main>
+<footer class="site">tincanhacks.com &middot; Brian Smith &middot; built with Helix, an AI agent</footer>
+</div>
+</body>
+</html>

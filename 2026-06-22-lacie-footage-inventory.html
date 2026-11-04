@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>What&#x27;s Actually on the LaCie · TinCanHacks</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+<header class="site">
+<h1>TIN<span class="can">CAN</span>HACKS</h1>
+<p class="tag">Tech and AI work logged from a 1979 Airstream and wherever it's parked.</p>
+<nav class="site"><a class="" href="index.html">index</a><a href="about.html">about</a></nav>
+</header>
+<main>
+<a class="back" href="index.html">&larr; index</a>
+<article class="post"><h2>What&#x27;s Actually on the LaCie</h2><div class="post-meta"><span class="date">2026-06-22</span></div><p>There's a 1.4 TB LaCie drive that has followed me through a boat, a house, and now a trailer. Nobody, including me, had a real answer to the question of what's on it. So Helix wrote a script and we found out.</p>
+<p>The numbers, from the run on June 22: 1,185 files, 716 of them media. 577 videos, 131 images, 8 audio files. The script ffprobed every video it could and came back with 73.4 hours of total video runtime. Eight files failed to probe, which is a better ratio than I expected from a drive that's been moved this much.</p>
+<p>The big piles make sense once you see them. 337 GB of Insta360 X3 footage. Two folders from a 2022 Blue Ridge Parkway trip holding 460 GB of GoPro video between them. A Mavic 2 Zoom folder with 49 drone videos and 43 stills. Motorcycle rides from 2020. Two folders labeled "Fast 345 purchase" and "Farewell Sail" that contain the exact same 12 videos, because of course they do. Also 116 GPX tracks and 49 SRT subtitle files from past transcription work.</p>
+<p>The tool itself is boring in the best way. Walk the volume, skip the macOS junk folders, probe each file, write a CSV and a JSON, pull a thumbnail off every video, assemble a contact sheet.</p>
+<pre class="python">ROOT = Path(&#x27;/Volumes/LaCie HDD&#x27;)
+VIDEO_EXT = {&#x27;.mp4&#x27;, &#x27;.mov&#x27;, &#x27;.m4v&#x27;, &#x27;.avi&#x27;, &#x27;.mkv&#x27;, &#x27;.mts&#x27;, &#x27;.insv&#x27;}
+SKIP_DIRS = {&#x27;.Spotlight-V100&#x27;, &#x27;.Trashes&#x27;, &#x27;.fseventsd&#x27;}
+
+def ffprobe(path):
+    cmd = [&#x27;ffprobe&#x27;, &#x27;-v&#x27;, &#x27;error&#x27;, &#x27;-print_format&#x27;, &#x27;json&#x27;,
+           &#x27;-show_format&#x27;, &#x27;-show_streams&#x27;, str(path)]
+    code, out, err = run(cmd, timeout=60)
+    if code != 0:
+        return {&#x27;probe_error&#x27;: err.strip()[:500] or f&#x27;exit {code}&#x27;}
+    ...</pre>
+<p>The following two days were the follow-through. A separate offload pipeline processed 129 files, generated low-res proxies for editing, and ran transcription on anything with an audio track. The drone files dutifully reported <code>no-audio</code>. Mavic footage is silent. The script didn't know that, but it handled it.</p>
+<p>Two things came out of this beyond the spreadsheet. First, 73 hours of footage is a lot to just own without a plan. Second, duplicate folders are how you can tell which files you were scared to delete. The "Farewell Sail" copy exists because one copy felt risky.</p>
+<p>The inventory lives in the workspace as <code>lacie-footage-inventory-20260622-204737</code>, with the CSV, the JSON, the story briefs, and a contact sheet of thumbnails. Next real step is deciding what gets edited and what gets archived cold. At least now that's a decision with data behind it.</p></article>
+</main>
+<footer class="site">tincanhacks.com &middot; Brian Smith &middot; built with Helix, an AI agent</footer>
+</div>
+</body>
+</html>

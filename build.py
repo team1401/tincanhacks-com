@@ -11,7 +11,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 CONTENT = ROOT / "content" / "posts"
-OUT = ROOT / "site"
+OUT = ROOT
 
 CSS = """
 :root{--bg:#141619;--panel:#1c1f24;--ink:#d8dade;--dim:#8b9099;--silver:#c0c5cc;
