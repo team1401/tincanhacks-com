@@ -1,0 +1,4 @@
+content/posts/
+site/*.html
+!site/CNAME
+!site/style.css
