@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>A daily radar for desktop AI hardware that checks its own citations · TinCanHacks</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+<header class="site">
+<h1>TIN<span class="can">CAN</span>HACKS</h1>
+<p class="tag">Tech and AI work logged from a 1979 Airstream and wherever it's parked.</p>
+<nav class="site"><a class="" href="index.html">index</a><a href="about.html">about</a></nav>
+</header>
+<main>
+<a class="back" href="index.html">&larr; index</a>
+<article class="post"><h2>A daily radar for desktop AI hardware that checks its own citations</h2><div class="post-meta"><span class="date">2026-10-28</span></div><p>I care about a narrow slice of tech news: small desktop boxes for local AI inference, things like the DGX Spark and the GB10 machines from various vendors. The problem with following it is that aggregators repost each other, and an LLM asked to summarize the news will confidently invent headlines that never existed. So Helix and I built a pipeline where the summarizer can't get away with it.</p>
+<p>Every morning at 7:50 a cron job runs a fetch script. It pulls six RSS feeds (TechCrunch AI, The Verge AI, MIT Tech Review, the Google AI blog, the NVIDIA blog, and one AI news site) and adds Bing News RSS endpoints for nine pinned queries:</p>
+<pre class="python">queries = [&#x27;&quot;DGX Spark&quot;&#x27;, &#x27;&quot;GB10&quot; NVIDIA&#x27;, &#x27;&quot;DGX Station&quot;&#x27;,
+           &#x27;&quot;RTX&quot; workstation local AI&#x27;,
+           &#x27;Apple &quot;Max&quot; &quot;AI&quot; local inference&#x27;,
+           &#x27;llama.cpp MLX Ollama security vulnerability&#x27;,
+           &#x27;GB10 Dell Acer ASUS Gigabyte HP Lenovo MSI PNY&#x27;,
+           &#x27;&quot;Apple Silicon&quot; local AI October 2026&#x27;]
+feeds += [&#x27;https://www.bing.com/news/search?q=&#x27; +
+          urllib.parse.quote(q) + &#x27;&amp;format=rss&#x27; for q in queries]</pre>
+<p>The script fetches everything in a thread pool, parses both RSS and Atom formats, and keeps only entries whose pubDate falls inside a strict 48-hour window. Bing's redirect links get unwrapped to the real URL. The output is a JSON file of sources, and the briefing gets written from that file. If a headline isn't in the JSON, it doesn't exist.</p>
+<p>The briefings themselves have house rules. Each item gets a "why it matters" line and a reliability caveat. The November 1 edition covered a first-hand report of running a quantized model on an ASUS GX10 at 1,450 tokens/second prefill. The briefing said, in effect: these are one user's numbers, not a reproduced benchmark, and the author hasn't shown the quantization preserves output quality. It also noted that official DGX Spark support was announced October 27, outside the window, so it was mentioned with a date instead of smuggled in as news.</p>
+<p>The whole thing is maybe a hundred lines of Python plus a prompt. The discipline it enforces is worth more than the code: a fixed window, a fixed source list, and a rule that every claim traces back to a fetched file.</p></article>
+</main>
+<footer class="site">tincanhacks.com &middot; Brian Smith &middot; built with Helix, an AI agent</footer>
+</div>
+</body>
+</html>

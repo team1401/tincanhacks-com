@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Teaching an agent which sensor changes matter · TinCanHacks</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+<header class="site">
+<h1>TIN<span class="can">CAN</span>HACKS</h1>
+<p class="tag">Tech and AI work logged from a 1979 Airstream and wherever it's parked.</p>
+<nav class="site"><a class="" href="index.html">index</a><a href="about.html">about</a></nav>
+</header>
+<main>
+<a class="back" href="index.html">&larr; index</a>
+<article class="post"><h2>Teaching an agent which sensor changes matter</h2><div class="post-meta"><span class="date">2026-05-14</span></div><p>My Home Assistant instance listens to a lot of sensors: a Victron SmartShunt, the MultiPlus-II inverter, GPS, temperature and humidity probes. On May 13 I had Helix work through the event stream and sort what deserved attention. Here is a sample of what actually came in that day:</p>
+<ul><li>- SmartShunt DC bus voltage: 54.0V to 53.99V</li><li>- GPS latitude: 47.047067479 to 47.047068104</li><li>- Inverter output power L1: 199.0W to 191.0W</li><li>- Controller humidity: 31.59% to 31.55%</li></ul>
+<p>The useful answer was short. No action needed. The voltage and inverter numbers are appliance cycling. The humidity move is sensor drift. The GPS latitude shifted about six centimeters while the trailer was parked. Half of automating a rig is teaching the software what to ignore.</p>
+<p>The same month I reworked the thermostat automation. The old logic chased every temperature reading. The new loop runs on a timer, compares the desired mode against what the AC is actually doing, and only pushes a setpoint when the difference clears a threshold:</p>
+<pre class="yaml">- id: smart_thermostat_control_loop
+  alias: Smart Thermostat Control Loop
+  description: Control climate.air_conditioner with time-based sensor
+    + modes + 10F push (debounced)
+  triggers:
+    - minutes: /1
+      trigger: time_pattern</pre>
+<p>Applying it was its own lesson. The edit shipped as a small Python script that reads automations.yaml, writes a timestamped backup copy first, then inserts the new block. Every change to a running config gets a backup whose filename says what changed and when.</p>
+<p>The rest of May was connectivity housekeeping. On May 11 I started keeping dated backups of the agent's own config. Two sessions on May 19 chased Mac Mini Tailscale connectivity, filed as issues #32 and #35, and the next day went to troubleshooting an Apple Watch health webhook. There was also the airport-proximity cron that kept inventing trips. When I asked why it thought I had a flight from ORD to LAX, the follow-up message was simply: less junk for sure.</p>
+<p>None of this is glamorous work. It is the maintenance layer: backups, noise filters, debounced setpoints, and a growing list of things the agent is allowed to decide on its own.</p></article>
+</main>
+<footer class="site">tincanhacks.com &middot; Brian Smith &middot; built with Helix, an AI agent</footer>
+</div>
+</body>
+</html>

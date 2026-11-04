@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Answering &quot;where did this team work in 2026&quot; with two imperfect sources · TinCanHacks</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+<header class="site">
+<h1>TIN<span class="can">CAN</span>HACKS</h1>
+<p class="tag">Tech and AI work logged from a 1979 Airstream and wherever it's parked.</p>
+<nav class="site"><a class="" href="index.html">index</a><a href="about.html">about</a></nav>
+</header>
+<main>
+<a class="back" href="index.html">&larr; index</a>
+<article class="post"><h2>Answering &quot;where did this team work in 2026&quot; with two imperfect sources</h2><div class="post-meta"><span class="date">2026-11-02</span></div><p>A question came up at work: for a list of HPE field engineers, where did each person actually work during 2026? Answering it by hand means months of digging. Answering it from data took an afternoon, and the interesting part is how the two available sources disagreed.</p>
+<p>Source one was the FieldNotes production database, the logging app I maintain. It had 639 daily entries for the requested names, each with a location and a project. The catch: the database is a partial import of history, so some people had 80 logged days and others had five.</p>
+<p>Source two was the SharePoint archive of weekly reports for 2026, 4,982 files. The filenames carry the location and the week. One source tells you days logged, the other tells you weeks reported. Neither alone answers the question.</p>
+<p>The merge produced a CSV, then a markdown report and a Word doc:</p>
+<pre class="csv">employee,projects,location,db_logged_days,archive_report_weeks
+Alex Chavez,HPE Training,Remote,25,4
+Austin Rhem,HPE Training,Remote,49,11
+Austin Rhem,HPE Volta-Training,1432 S Clinton St (Volta),6,
+Austin Rhem,HPE Volta,Chicago IL (Volta - CoreSite),5,5</pre>
+<p>For one engineer the report came out like this: 80 remote days on training work, 60 days at Stennis, MS across four project labels, 10 days at AFRL in Dayton, 5 days at SpaceX in Hawthorne, plus a handful of report weeks in places with no matching log entries. That last row type is what the merge exists for: the SharePoint filename proves the week happened even when nobody logged the day.</p>
+<p>The edge cases were the real work. Location strings are free text, so "Chippewa Falls Wisconsin" and "Chippewa Falls, WI" are two locations until you say otherwise. One name on the list had zero records in either source, no reports and no log entries and no close spelling match. The report doesn't guess. It says no 2026 records exist and recommends verifying the spelling with HPE.</p>
+<p>Same person, same afternoon, two formats: a machine-readable CSV for anyone who wants to slice it, and a formatted Word document for the people who will only ever open the docx. Both carry the same numbers, and both state their sources at the top so nobody has to trust the answer without being able to check it.</p></article>
+</main>
+<footer class="site">tincanhacks.com &middot; Brian Smith &middot; built with Helix, an AI agent</footer>
+</div>
+</body>
+</html>

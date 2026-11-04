@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Auditing the agent before trusting it · TinCanHacks</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+<header class="site">
+<h1>TIN<span class="can">CAN</span>HACKS</h1>
+<p class="tag">Tech and AI work logged from a 1979 Airstream and wherever it's parked.</p>
+<nav class="site"><a class="" href="index.html">index</a><a href="about.html">about</a></nav>
+</header>
+<main>
+<a class="back" href="index.html">&larr; index</a>
+<article class="post"><h2>Auditing the agent before trusting it</h2><div class="post-meta"><span class="date">2026-04-26</span></div><p>April 25 was the first session in my current record with Hermes running on the Mac. I spent most of that day and the next telling the agent to check the system clock. It sounds petty. It matters when every log line, backup file, and cron report you plan to trust starts with a timestamp.</p>
+<p>That first stretch was mostly audits. Read-only audit of the setup: config, provider and model routing, toolsets, delegation config, gateway status, cron jobs, skills. Then a second pass on the cron jobs that were timing out, with instructions to gather evidence, identify the root cause, and only then touch anything. The Substack job got a supervised test run. Draft only, no publish.</p>
+<p>I also had it audit the scheduled automations from my old OpenClaw setup and migrate the compatible ones into Hermes, saving a sanitized report to the workspace. No secrets in the report. That rule shows up in almost every prompt from this period: do not print secrets.</p>
+<p>The Home Assistant work started the same weekend, and it started with plumbing. The agent could not reach HA at 192.168.50.5:8123 even though the host sat on the same LAN. The fix came from boring checks:</p>
+<pre class="bash">date
+hostname
+route get 192.168.50.5
+ping -c 2 -W 1000 192.168.50.5
+nc -z -G 3 192.168.50.5 8123</pre>
+<p>Route resolved, ping answered, TCP connect worked. The token verified fine against the REST API once I stopped guessing and used the configured HASS_URL. The actual fault was a stale gateway session. Restarting the Hermes gateway reinitialized the connector, and Telegram came back with it.</p>
+<p>A few days later, April 28, the work escalated to a client job: implementing Let's Encrypt HTTPS for a client's Keycloak. The instructions were to find and use DNS provider credentials if DNS turned out to be the blocker, and otherwise stop cleanly with the exact blocker and the staged changes listed. Stop cleanly with the exact blocker is a phrase I have typed more than any model should have to hear.</p>
+<p>By the end of the month the pattern was set. Every task got a scope, a safety rule, and a verification step. Most of the prompting skill turned out to be writing down how I already work, in a format a machine can follow.</p></article>
+</main>
+<footer class="site">tincanhacks.com &middot; Brian Smith &middot; built with Helix, an AI agent</footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Riverfront Decision, Rendered in HTML · TinCanHacks</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+<header class="site">
+<h1>TIN<span class="can">CAN</span>HACKS</h1>
+<p class="tag">Tech and AI work logged from a 1979 Airstream and wherever it's parked.</p>
+<nav class="site"><a class="" href="index.html">index</a><a href="about.html">about</a></nav>
+</header>
+<main>
+<a class="back" href="index.html">&larr; index</a>
+<article class="post"><h2>The Riverfront Decision, Rendered in HTML</h2><div class="post-meta"><span class="date">2026-06-25</span></div><p>The idea of parking the Airstream on a Washington riverfront comes up constantly. Actually buying one is a multi-year problem. On June 25 we did the next best thing: ran a design bakeoff between two Gemini models in the Antigravity CLI and had each one build the same app from the same prompt. The folders are still there, <code>flash35</code> and <code>pro31</code>, zipped together as <code>tideglass-bakeoff-flash35-vs-pro31.zip</code>.</p>
+<p>The app concept was Tideglass. Four fictional riverfront candidates, each with a price, river or creek type, lot size, drive time, flood risk, Airstream feasibility, utilities, and one poetic field note. Three scoring lenses, beauty, practicality, risk, that re-rank the candidates when you switch between them. The prompt had teeth. It banned glassmorphism, gradient text, generic SaaS card grids, neon cyberpunk, and "bland Tailwind-looking layouts," then demanded a real fine-art influence, named as an example, and told the model to translate the principle instead of copying the art.</p>
+<p>One answer was ukiyo-e print margins and Hokusai's river movement. Washi-ivory background in oklch, borders in carbon charcoal, zero rounded corners everywhere because print blocks don't have border-radius. Active badges styled as vermilion hanko seals. The header sits on three layered animated waves that change color with the selected lens, surging red under risk, resting Prussian blue under beauty. Each property got a hand-coded SVG sketch of its shoreline, pines, and a parked Airstream, because stock icons would have given the whole thing away.</p>
+<p>The same week produced a drier sibling: Riverfront Scout, a standard-library-only Python CLI that scores a CSV of real listings against the actual criteria, under $500k and room for a 31-foot trailer.</p>
+<pre class="python">def score_listing(listing):
+    score = 50
+    reasons = []
+    red_flags = []
+
+    # 1. Price scoring (Target &lt;= $500,000)
+    price_val = parse_price(listing.get(&#x27;price&#x27;, &#x27;&#x27;))
+    if price_val is not None:
+        if price_val &lt;= 500000:
+            reasons.append(f&quot;Price is within budget (${price_val:,.2f})&quot;)
+            score += 15 if price_val &lt;= 300000 else 5</pre>
+<p>Base score 50, then adjustments. River frontage plus 25. Lot big enough for the trailer plus 10 or 15. Fresh listing under a week on market plus 10. Red flags cap the score so a gorgeous flood-zone lot can't score 100. The report even generates questions to ask the agent.</p>
+<p>The bakeoff question was which model designs better. Both answers are still in the zip for anyone who wants to judge. The honest part is this: the house doesn't exist yet. The tool does. The scoring is done, the lenses are tuned, and the riverfront is still a field note someone wrote about a fictional lot.</p></article>
+</main>
+<footer class="site">tincanhacks.com &middot; Brian Smith &middot; built with Helix, an AI agent</footer>
+</div>
+</body>
+</html>
